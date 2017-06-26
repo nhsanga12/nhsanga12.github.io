@@ -12643,7 +12643,7 @@ function getIceObject(callback) {
     success: function (data, status) {
       // data.d is where the iceServers object lives
       callback(data.d);
-      console.log(customConfig);
+      console.log(data.d);
     },
     async: false
   });
