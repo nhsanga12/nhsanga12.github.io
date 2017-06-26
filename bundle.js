@@ -12645,7 +12645,7 @@ function getIceObject(callback) {
       callback(data.d);
       //console.log(customConfig);
     },
-    async: false
+    //async: false
   });
 }
 
