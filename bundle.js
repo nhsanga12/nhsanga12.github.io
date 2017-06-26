@@ -13406,7 +13406,7 @@ return jQuery;
 /***/ (function(module, exports) {
 
 function openStream(callback) {
-    navigator.mediaDevices.getUserMedia({audio: false, video: true})
+    navigator.mediaDevices.getUserMedia({audio: true, video: true})
         .then(function(stream) {
             callback(stream);
         })
@@ -13416,6 +13416,7 @@ function openStream(callback) {
 }
 
 module.exports = openStream;
+
 
 /***/ }),
 /* 16 */
