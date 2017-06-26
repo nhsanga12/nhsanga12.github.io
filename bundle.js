@@ -1551,44 +1551,49 @@ const $ = __webpack_require__(14);
 const openStream = __webpack_require__(15);
 const playVideo = __webpack_require__(16);
 const io = __webpack_require__(37);
+const getIceObject = __webpack_require__(64);
 
-const socket = io('http://localhost:3000');
+//const socket = io('http://localhost:3000');
 
-const config = {
-  host: 'streaming-sang.herokuapp.com',
-  port: 443,
-  secure: true,
-  key: 'peerjs'
-};
+getIceObject(iceConfig => {
+  const connectionConfig = {
+    host: 'streaming-sang.herokuapp.com',
+    port: 443,
+    secure: true,
+    key: 'peerjs',
+    config: iceConfig
+  };
+
+  const peerId = getPeer();
+  const peer = new Peer(peerId, connectionConfig);
+
+  $('#btnCall').click(() => {
+    const friendId = $('#txtFriendId').val();
+    openStream(stream => {
+      playVideo(stream, 'localStream');
+      const call = peer.call(friendId, stream);
+      call.on('stream', remoteStream => {
+        playVideo(remoteStream, 'friendStream');
+      });
+    });
+  });
+
+  peer.on('call', (call) => {
+    openStream(stream => {
+      playVideo(stream, 'localStream');
+      call.answer(stream);
+      call.on('stream', remoteStream => {
+        playVideo(remoteStream, 'friendStream');
+      });
+    });
+  });
+});
 
 function getPeer() {
   const id = uid(10);
   $('#peer-id').html(id);
   return id;
 }
-
-const peer = new Peer(getPeer(), config);
-
-$('#btnCall').click(() => {
-  const friendId = $('#txtFriendId').val();
-  openStream(stream => {
-    playVideo(stream, 'localStream');
-    const call = peer.call(friendId, stream);
-    call.on('stream', remoteStream => {
-      playVideo(remoteStream, 'friendStream');
-    });
-  });
-});
-
-peer.on('call', (call) => {
-  openStream(stream => {
-    playVideo(stream, 'localStream');
-    call.answer(stream);
-    call.on('stream', remoteStream => {
-      playVideo(remoteStream, 'friendStream');
-    });
-  });
-});
 
 
 /***/ }),
@@ -20129,6 +20134,35 @@ Backoff.prototype.setJitter = function(jitter){
   this.jitter = jitter;
 };
 
+
+
+/***/ }),
+/* 64 */
+/***/ (function(module, exports, __webpack_require__) {
+
+const $ = __webpack_require__(14);
+
+function getIceObject(callback) {
+  $.ajax({
+    url: "https://service.xirsys.com/ice",
+    data: {
+      ident: "nhsang",
+      secret: "cf308ff8-5a84-11e7-a7f4-7c1897126280",
+      domain: "nhsanga12.github.io",
+      application: "default",
+      room: "default",
+      secure: 1
+    },
+    success: function (data, status) {
+      // data.d is where the iceServers object lives
+      callback(data.d);
+      //console.log(customConfig);
+    },
+    async: false
+  });
+}
+
+module.exports = getIceObject;
 
 
 /***/ })
