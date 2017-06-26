@@ -12604,7 +12604,7 @@ getIceObject(iceConfig => {
     });
   });
 
-  peer.on('call', (call) => {
+  peer.on('call', call => {
     openStream(stream => {
       playVideo(stream, 'localStream');
       call.answer(stream);
@@ -12643,9 +12643,9 @@ function getIceObject(callback) {
     success: function (data, status) {
       // data.d is where the iceServers object lives
       callback(data.d);
-      //console.log(customConfig);
+      console.log(customConfig);
     },
-    //async: false
+    async: false
   });
 }
 
