@@ -1546,69 +1546,86 @@ module.exports = Negotiator;
 /***/ (function(module, exports, __webpack_require__) {
 
 const Peer = __webpack_require__(7);
-const uid = __webpack_require__(13);
 const $ = __webpack_require__(14);
-const openStream = __webpack_require__(15);
-const playVideo = __webpack_require__(16);
 const io = __webpack_require__(37);
 const getIceObject = __webpack_require__(64);
+const openStream = __webpack_require__(15);
+const playVideo = __webpack_require__(16);
 
 const socket = io('https://stream-node-server.herokuapp.com');
+//const socket = io('http://localhost:3000');
 
-getIceObject(iceConfig => {
-  const connectionConfig = {
-    host: 'streaming-sang.herokuapp.com',
-    port: 443,
-    secure: true,
-    key: 'peerjs',
-    config: iceConfig
-  };
+const connectionConfig = {
+  host: 'streaming-sang.herokuapp.com',
+  port: 443,
+  secure: true,
+  key: 'peerjs',
+  config: getIceObject()
+};
+const peer = new Peer(connectionConfig);
 
-  const peerId = getPeer();
-  socket.emit('NEW_PEER_ID', peerId);
-  const peer = new Peer(peerId, connectionConfig);
-
-  $('#ulPeerId').on('click', 'li', function() {
-    const peerId = $(this).text();
-    openStream(stream => {
-      playVideo(stream, 'localStream');
-      const call = peer.call(peerId, stream);
-      call.on('stream', remoteStream => {
-        playVideo(remoteStream, 'friendStream');
-      });
+peer.on('open', id => {
+    $('#btnRegister').click(() => {
+        const username = $("#txtUsername").val();
+        socket.emit('NGUOI_DUNG_DANG_KY', { ten: username, peerId: id });
     });
-  });
+});
 
-  peer.on('call', call => {
-    openStream(stream => {
-      playVideo(stream, 'localStream');
-      call.answer(stream);
-      call.on('stream', remoteStream => {
-        playVideo(remoteStream, 'friendStream');
-      });
+$('#ulPeerId').on('click', 'li', function() {
+  const peerId = $(this).attr('id');
+  openStream(stream => {
+    playVideo(stream, 'localStream');
+    const call = peer.call(peerId, stream);
+    call.on('stream', remoteStream => {
+      playVideo(remoteStream, 'friendStream');
     });
   });
 });
 
-function getPeer() {
-  const id = uid(10);
-  $('#peer-id').html(id);
-  return id;
-}
-
-socket.on('ONLINE_PEER', arrPeerId => {
-  arrPeerId.forEach(id => {
-    $('#ulPeerId').append(`<li id="${id}">${id}</li>`);
+peer.on('call', call => {
+  openStream(stream => {
+    playVideo(stream, 'localStream');
+    call.answer(stream);
+    call.on('stream', remoteStream => {
+      playVideo(remoteStream, 'friendStream');
+    });
   });
 });
 
-socket.on('NEW_CLIENT_CONNECT', id => {
-  $('#ulPeerId').append(`<li id="${id}">${id}</li>`);
+socket.on('DANH_SACH_ONLINE', arrUserInfo => {
+    $('#div-chat').show();
+    $('#div-dang-ky').hide();
+
+    arrUserInfo.forEach(user => {
+        const { ten, peerId } = user;
+        const html = `<li id="${peerId}" class="left clearfix">
+          <div class="chat-body clearfix">
+            <div class="header_sec">
+              <strong class="primary-font">${ten}</strong>
+            </div>
+          </div>
+        </li>`;
+        $('#ulPeerId').append(html);
+    });
+
+    socket.on('CO_NGUOI_DUNG_MOI', user => {
+        const { ten, peerId } = user;
+        const html = `<li id="${peerId}" class="left clearfix">
+          <div class="chat-body clearfix">
+            <div class="header_sec">
+              <strong class="primary-font">${ten}</strong>
+            </div>
+          </div>
+        </li>`;
+        $('#ulPeerId').append(html);
+    });
+
+    socket.on('AI_DO_NGAT_KET_NOI', peerId => {
+        $(`#${peerId}`).remove();
+    });
 });
 
-socket.on('SOMEONE_DISCONNECT', peerId => {
-  $(`#${peerId}`).remove();
-});
+socket.on('DANG_KY_THAT_BAT', () => alert('Tên này đã được sử dụng, vui lòng chọn một tên khác!'));
 
 
 /***/ }),
@@ -3134,29 +3151,7 @@ module.exports = util;
 
 
 /***/ }),
-/* 13 */
-/***/ (function(module, exports) {
-
-/**
- * Export `uid`
- */
-
-module.exports = uid;
-
-/**
- * Create a `uid`
- *
- * @param {String} len
- * @return {String} uid
- */
-
-function uid(len) {
-  len = len || 7;
-  return Math.random().toString(35).substr(2, len);
-}
-
-
-/***/ }),
+/* 13 */,
 /* 14 */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -20171,8 +20166,7 @@ function getIceObject(callback) {
     },
     success: function (data, status) {
       // data.d is where the iceServers object lives
-      callback(data.d);
-      console.log(data.d);
+      return data.d;
     },
     async: false
   });

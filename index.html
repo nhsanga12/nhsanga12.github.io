@@ -1,15 +1,75 @@
 <html>
-    <title>Sang Nguyen WebRTC</title>
-    <body>
-        <h1>Live Stream</h1>
-        <h3>My Peer Id: <span id="peer-id"></span></h3>
-        <video id="localStream" width="300" controls></video>
-        <br/>
-        <video id="friendStream" width="300" controls></video>
-        <br/>
+<head>
+  <meta charset="utf-8">
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="bootstrap.min.css">
+  <title>Sang Nguyen Demo Live Stream</title>
+</head>
 
-        <h1>List online</h1>
-        <ul id="ulPeerId"></ul>
-    </body>
-    <script src="bundle.js"></script>
+<body>
+  <div id="div-dang-ky" class="main_section">
+    <div class="container">
+      <div class="chat_container">
+        <h3>Tên của bạn là gì?</h3>
+        <input type="text" id="txtUsername" />
+        <input type="button" value="Chat thôi!" id="btnRegister" />
+      </div>
+    </div>
+  </div>
+
+  <div id="div-chat" class="main_section" style="display: none;">
+    <div class="container">
+      <div class="chat_container">
+        <div class="col-sm-3 chat_sidebar">
+          <div class="row">
+            <div id="custom-search-input">
+               <div class="input-group col-md-12">
+                  ONLINE LIST
+               </div>
+            </div>
+            <div class="member_list">
+              <ul id="ulPeerId" class="list-unstyled">
+
+              </ul>
+            </div>
+          </div>
+        </div>
+        <!--chat_sidebar-->
+
+
+        <div class="col-sm-9 message_section">
+          <div class="row">
+            <div id="custom-search-input">
+               <div class="input-group col-md-12">
+                  LIVE STREAM
+               </div>
+            </div>
+            <!--new_message_head-->
+
+            <div class="chat_area">
+              <ul class="list-unstyled">
+                <li class="left clearfix">
+                  <div class="chat-body1 clearfix">
+                    <video id="localStream" width="300" controls></video>
+                  </div>
+                </li>
+                <li class="left clearfix">
+                  <div class="chat-body1 clearfix">
+                    <video id="friendStream" width="300" controls></video>
+                  </div>
+                </li>
+
+              </ul>
+            </div>
+
+          </div>
+        </div>
+        <!--message_section-->
+      </div>
+    </div>
+  </div>
+
+</body>
+<script src="bundle.js"></script>
+
 </html>
